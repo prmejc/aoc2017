@@ -3,16 +3,18 @@ import java.nio.file.Files;
 import java.util.stream.Stream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.IntSummaryStatistics;
+import java.util.stream.Collectors;
 
 public Stream<String> openFile(String name) throws IOException{
     return Files.lines(new File(name).toPath());
 }
 
 public int part1(String line) {
-    return 
-        Arrays.stream(line.split("	")).map((e) -> Integer.parseInt(e)).max((i1,i2) -> i1 - i2).get()
-        - Arrays.stream(line.split("	")).map((e) -> Integer.parseInt(e)).min((i1,i2) -> i1 - i2).get()
-    ;
+    IntSummaryStatistics stats =  Arrays.stream(line.split("	"))
+                                            .map(Integer::parseInt)
+                                            .collect(Collectors.summarizingInt(Integer::intValue));
+    return stats.getMax() - stats.getMin();
 }
 
 public int part2(String line) {
