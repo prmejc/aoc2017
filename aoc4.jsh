@@ -5,42 +5,36 @@ import java.util.stream.Collectors;
 import java.io.IOException;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Arrays;
 
 public Stream<String> openFile(String name) throws IOException{
     return Files.lines(new File(name).toPath());
 }
 
 public boolean areWordsUnique(String line){
-    Set<String> unique = new HashSet<String>();
-    String []words = line.split(" ");
-    for(String word: words){
-        unique.add(word);
-    }
-    return unique.size() == words.length;
+    return Arrays.stream(line.split(" "))
+                    .collect(Collectors.toSet())
+                    .size() 
+            == line.split(" ").length;
 }
+
 public boolean areWordsUniqueWithoutAnagrams(String line){
-    Set<String> unique = new HashSet<String>();
-    String []words = line.split(" ");
-    for(String word: words){
-        unique.add(
-                //alphabetically ordered characters as String
-                word.chars()
-                    .sorted()
-                    .mapToObj(c -> (char)c+"")
-                    .collect(Collectors.joining(""))
-        );
-    }
-    return unique.size() == words.length;
+    return Arrays.stream(line.split(" "))
+                 .map(word -> word.chars()
+                                  .sorted()
+                                  .mapToObj(c -> (char)c+"")
+                                  .collect(Collectors.joining(""))
+                 )
+                 .collect(Collectors.toSet()).size()
+           == line.split(" ").length;
 }
 
-public int part1(String phraseFile) throws IOException {
-    Stream<String> lines = openFile(phraseFile);
-    return lines.filter(l -> areWordsUnique(l)).mapToInt(l -> 1).sum();
+public long part1(String phraseFile) throws IOException {
+    return openFile(phraseFile).filter(line -> areWordsUnique(line)).count();
 }
 
-public int part2(String phraseFile) throws IOException {
-    Stream<String> lines = openFile(phraseFile);
-    return lines.filter(l -> areWordsUniqueWithoutAnagrams(l)).mapToInt(l -> 1).sum();
+public long part2(String phraseFile) throws IOException {
+    return openFile(phraseFile).filter(line -> areWordsUniqueWithoutAnagrams(line)).count();
 }
 
 System.out.println(part1("passPhrases.txt"));
